@@ -1,0 +1,60 @@
+paths:
+  data_dir: ~/jinghaoyu/datasets
+  workspace_dir: ./workspace
+  sr_dir: /home/david_cwq/jinghaoyu/sr-pr
+  sr_eval_dir: /home/david_cwq/jinghaoyu/sr-pr/src/training/model_eval
+
+python:
+  eval_venv: ~/jinghaoyu/bench-venv/bin/python
+  judge_venv: ~/jinghaoyu/vllm028-env/bin/python
+  e2e_venv: ~/jinghaoyu/vllm028-env/bin/python  
+  vllm_venv: ~/jinghaoyu/vllm028-env/bin/vllm
+launcher:
+  type: srun
+  partition: h20
+  node: vllm-h20-02
+  ssh_key: ''
+  container: ''
+  cpus_per_task: 16
+  time_limit: 01:00:00
+models:
+  small:
+    model_dir: ~/jinghaoyu/models/Qwen3.5-4B
+    served_name: qwen3.5-4b
+    tensor_parallel: 1
+    n_gpu: 1
+    max_model_len: 16384
+    gpu_memory_utilization: 0.9
+    gen_params: templates/gen_params_small.json
+  large:
+    model_dir: ~/jinghaoyu/models/DeepSeek-V4-Flash
+    served_name: dsv4-flash
+    tensor_parallel: 4
+    n_gpu: 4
+    max_model_len: 16384
+    gpu_memory_utilization: 0.9
+    kv_cache_dtype: fp8
+    gen_params: templates/gen_params_large.json
+vllm:
+  port: 8000
+  ready_timeout: 900
+  stop_wait: 15
+sr_stack:
+  sr_root: /home/david_cwq/jinghaoyu/sr-pr
+  envoy_bin: ~/jinghaoyu/tools/envoy/bin/envoy
+  binding_dir: ~/jinghaoyu/sr/candle-binding/target/release
+  sr_base_url: http://127.0.0.1:8080
+  envoy_port: 8888
+  vllm_small_port: 8000
+  vllm_large_port: 8001
+  routing_overhead_s: 0.367
+sampling:
+  seed: 42
+  mmlu_per_subject: 2
+  mmlu_pro_per_category: 8
+  cmmlu_per_subject: 8
+  ceval_per_subject: 6
+  fresh_multiplier: 3
+  train_ratio: 0.333
+pipeline:
+  resume: true
