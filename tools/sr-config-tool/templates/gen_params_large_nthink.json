@@ -2,6 +2,6 @@
   "temperature": 0.0,
   "top_p": 1.0,
   "max_tokens": 4096,
-  "chat_template_kwargs": {"chat_template_kwargs": {"enable_thinking": false}},
-  "note": "Large model nothink mode: disable thinking via chat template kwargs, greedy decode for deterministic evaluation"
+  "chat_template_kwargs": {"enable_thinking": false},
+  "note": "Large model nothink mode: greedy decode for deterministic evaluation. chat_template_kwargs is passed through as-is (extra_body) by multi_benchmark_eval.py, so it must stay single-level for vLLM to see enable_thinking."
 }

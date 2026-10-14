@@ -113,7 +113,8 @@ def main():
                     "answer_type": "letter",
                 }
             )
-    out_path = workspace / "office_eval_testset.jsonl"
+    out_path = workspace / "results" / "office_eval_testset.jsonl"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as f:
         for r in out:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")

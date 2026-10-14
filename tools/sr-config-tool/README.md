@@ -76,10 +76,12 @@ python src/pipeline.py --task-id my-exp-01 think-gate
 python src/pipeline.py --task-id my-exp-01 cost-calib
 python src/pipeline.py --task-id my-exp-01 gen-config
 python src/pipeline.py --task-id my-exp-01 join
+python src/pipeline.py --task-id my-exp-01 convert
 python src/pipeline.py --task-id my-exp-01 e2e
 
-# 方式二：断点恢复
-python src/pipeline.py --task-id my-exp-01 --resume
+# 方式二：断点恢复（重发对应子命令即可；已完成的步骤按 state.json 自动跳过。
+# 注意：--resume 需与子命令一起使用，单独使用只打印状态）
+python src/pipeline.py --task-id my-exp-01 --resume run-eval --model small
 
 # 方式三：dry-run（只打印命令不执行）
 python src/pipeline.py --task-id my-exp-01 --dry-run build-tasks
@@ -103,6 +105,7 @@ python src/pipeline.py --list-tasks
 | 4b | think-gate | oracle 上界 + 半拆 CV | 否 |
 | 5c | gen-config | 用 result_to_config.py 生成 SR 配置 | 否 |
 | 6a | join | 离线 join（零 GPU 模拟配置效果） | 否 |
+| 6b 前置 | convert | eval→bench 测试集格式转换（e2e 缺测试集时自动调用） | 否 |
 | 6b | e2e | E2E 终验（vLLM + router + envoy → 压测） | 是 |
 
 ## 工作空间

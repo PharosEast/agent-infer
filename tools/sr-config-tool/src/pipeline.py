@@ -6,7 +6,7 @@ Each step is logged and recorded in state.json for resume capability.
 Usage:
     python pipeline.py --task-id my-exp build-tasks
     python pipeline.py --task-id my-exp run-eval --model small
-    python pipeline.py --task-id my-exp --resume
+    python pipeline.py --task-id my-exp --resume build-tasks
     python pipeline.py --list-tasks
     python pipeline.py --dry-run build-tasks
 """
@@ -75,7 +75,7 @@ def run_step(config, workspace, step_name, step_fn, dry_run=False, force=False):
         update_task_index(config, task_id, "failed", step_name)
         print(f"\n[FAILED] Step '{step_name}' failed.")
         print(f"  Log: {workspace}/logs/{step_name}.log")
-        print(f"  To resume: python pipeline.py --task-id {task_id} --resume")
+        print("  To resume: re-run this command with --resume (completed steps are skipped)")
         return False
 
     if step_name not in state["completed"]:
@@ -344,19 +344,38 @@ def step_join(config, workspace, dry_run=False):
     )
 
 
+def step_convert(config, workspace, dry_run=False):
+    """Convert eval_office.jsonl into the bench testset format (stage 6b precondition)."""
+    return _run_script(config, "convert_eval_to_bench", extra_args=["--task-id", workspace.name], dry_run=dry_run)
+
+
 def step_e2e(config, workspace, dry_run=False):
-    """Run E2E test. If office_eval_testset.jsonl is missing, create it from eval_office.jsonl."""
+    """Run E2E test, ensuring the bench testset exists first.
+
+    Prefers converting eval_office.jsonl via convert_eval_to_bench.py (which
+    reconstructs question/options and re-checks answers); falls back to a raw
+    copy only if conversion fails, printing a warning that the integrity
+    asserts were skipped.
+    """
     testset = workspace / "results" / "office_eval_testset.jsonl"
     if not testset.exists():
         eval_set = workspace / "tasks" / "eval_office.jsonl"
-        if eval_set.exists():
-            import shutil
-
-            testset.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(eval_set, testset)
-            print(f"[e2e] copied {eval_set} -> {testset}")
-        else:
+        if not eval_set.exists():
             print(f"[e2e] WARNING: {eval_set} not found, e2e may fail")
+        elif dry_run:
+            step_convert(config, workspace, dry_run=True)
+        else:
+            print("[e2e] testset missing, running convert first")
+            rc = step_convert(config, workspace, dry_run=False)
+            if not testset.exists():
+                import shutil
+
+                rc_info = f" (rc={rc.returncode})" if rc is not None and hasattr(rc, "returncode") else ""
+                print(f"[e2e] WARNING: convert failed{rc_info}; falling back to raw copy")
+                print("[e2e] WARNING: raw copy skips the answer/option-count integrity asserts")
+                testset.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(eval_set, testset)
+                print(f"[e2e] copied {eval_set} -> {testset}")
     return _run_script(config, "run_e2e", extra_args=["--task-id", workspace.name], dry_run=dry_run)
 
 
@@ -451,6 +470,9 @@ def main():
     # join
     subparsers.add_parser("join", help="Stage 6a: Offline join evaluation")
 
+    # convert
+    subparsers.add_parser("convert", help="Stage 6b precondition: Convert eval set to bench testset format")
+
     # e2e
     subparsers.add_parser("e2e", help="Stage 6b: E2E final validation")
 
@@ -492,6 +514,7 @@ def main():
         "cost-calib": ("cost-calib", step_cost_calib),
         "gen-config": ("gen-config", step_gen_config),
         "join": ("join", step_join),
+        "convert": ("convert", step_convert),
         "e2e": ("e2e", step_e2e),
     }
 

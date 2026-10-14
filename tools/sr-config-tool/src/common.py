@@ -90,8 +90,15 @@ def build_prompt(question, options):
 
 def load_config(config_path="config/run_config.yaml"):
     """Load run_config.yaml and expand ~ in path values."""
-    with open(config_path, encoding="utf-8") as f:
-        cfg = yaml.safe_load(f)
+    try:
+        with open(config_path, encoding="utf-8") as f:
+            cfg = yaml.safe_load(f)
+    except FileNotFoundError:
+        raise SystemExit(
+            f"config not found: {config_path}\n"
+            "Copy config/run_config.example.yaml to config/run_config.yaml first, "
+            "or pass --config <path>."
+        ) from None
     # Expand user home in known path fields
     for section in ("paths",):
         if section in cfg:
