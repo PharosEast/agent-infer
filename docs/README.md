@@ -10,7 +10,8 @@ Reference 和 Explanation；开发者内部设计稿位于仓根目录的 `desig
   [vLLM Router 构建与部署](zh/how-to/deploy-vllm-router.md)（Windows 构建见 [deploy-vllm-router-on-windows](zh/how-to/deploy-vllm-router-on-windows.md)）、
   [Semantic Router 构建与部署](zh/how-to/deploy-semantic-router.md)（Windows 构建见 [deploy-semantic-router-on-windows](zh/how-to/deploy-semantic-router-on-windows.md)），
   用于完成具体任务。
-- **Integrations**：[AgentRouter WASM affinity + native 补丁](../agentinfer/agentrouter/README.md)。
+- **Integrations**：[AgentRouter WASM affinity + native 补丁](../agentinfer/agentrouter/README.md)、
+  [InferRSI 工作台](zh/reference/inferrsi.md)。
 - **vLLM Semantic Router 昇腾材料**：[昇腾 NPU 部署](zh/vllm-semantic-router/ascend-npu.md)与
   [NPU 实测记录](zh/vllm-semantic-router/records/npu-perf-baseline-report-20261020.md)（parity / bf16 / 融合算子 / 性能基线）。
 - **Reference**：[Python API](zh/reference/python-api.md)、[基准命令行](zh/reference/benchmark-cli.md)、
@@ -25,7 +26,8 @@ Reference 和 Explanation；开发者内部设计稿位于仓根目录的 `desig
 - **How-to**: [Integrate with vLLM](en/how-to/integrate-vllm.md) and
   [run a benchmark](en/how-to/run-benchmark.md), [Trace Replay](en/how-to/run-trace-replay.md) to complete specific
   tasks.
-- **Integrations**: [AgentRouter WASM affinity + native patch](../agentinfer/agentrouter/README.md).
+- **Integrations**: [AgentRouter WASM affinity + native patch](../agentinfer/agentrouter/README.md),
+  [InferRSI workbench](en/reference/inferrsi.md).
 - **Reference**: [Python API](en/reference/python-api.md), [benchmark CLI](en/reference/benchmark-cli.md),
   [benchmark configuration](en/reference/benchmark-config.md), and
   [run artifacts](en/reference/run-artifacts.md) for interfaces and parameters.
